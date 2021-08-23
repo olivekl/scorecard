@@ -27,8 +27,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/go-github/v38/github"
-	"github.com/shurcooL/githubv4"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 
@@ -38,7 +36,6 @@ import (
 	sce "github.com/ossf/scorecard/v2/errors"
 	"github.com/ossf/scorecard/v2/pkg"
 	"github.com/ossf/scorecard/v2/repos"
-	"github.com/ossf/scorecard/v2/roundtripper"
 )
 
 var (
@@ -127,16 +124,10 @@ or ./scorecard --{npm,pypi,rubgems}=<package_name> [--checks=check1,...] [--show
 		}
 		ctx := context.Background()
 
-		rt := roundtripper.NewTransport(ctx, sugar)
-		httpClient := &http.Client{
-			Transport: rt,
-		}
-		githubClient := github.NewClient(httpClient)
-		graphClient := githubv4.NewClient(httpClient)
-		repoClient := githubrepo.CreateGithubRepoClient(ctx, githubClient, graphClient)
+		repoClient := githubrepo.CreateGithubRepoClient(ctx)
 		defer repoClient.Close()
 
-		repoResult, err := pkg.RunScorecards(ctx, repo, enabledChecks, repoClient, httpClient, githubClient, graphClient)
+		repoResult, err := pkg.RunScorecards(ctx, repo, enabledChecks, repoClient)
 		if err != nil {
 			log.Fatal(err)
 		}

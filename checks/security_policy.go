@@ -62,7 +62,7 @@ func SecurityPolicy(c *checker.CheckRequest) checker.CheckResult {
 	// https://docs.github.com/en/github/building-a-strong-community/creating-a-default-community-health-file
 	dotGitHub := c
 	dotGitHub.Repo = ".github"
-	dotGitHubClient := githubrepo.CreateGithubRepoClient(c.Ctx, c.Client, c.GraphClient)
+	dotGitHubClient := githubrepo.CreateGithubRepoClient(c.Ctx)
 	err = dotGitHubClient.InitRepo(c.Owner, c.Repo)
 
 	switch {

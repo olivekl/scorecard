@@ -15,7 +15,6 @@
 package e2e
 
 import (
-	"context"
 	"net/http"
 	"os"
 	"testing"
@@ -24,9 +23,6 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/shurcooL/githubv4"
-	"go.uber.org/zap"
-
-	"github.com/ossf/scorecard/v2/roundtripper"
 )
 
 var (
@@ -48,28 +44,6 @@ var _ = BeforeSuite(func() {
 	Expect(contains).ShouldNot(BeFalse(),
 		"GITHUB_AUTH_TOKEN env variable is not set.The GITHUB_AUTH_TOKEN env variable has to be set to run e2e test.")
 	Expect(len(token)).ShouldNot(BeZero(), "Length of the GITHUB_AUTH_TOKEN env variable is zero.")
-
-	ctx := context.TODO()
-
-	logLevel := zap.LevelFlag("verbosity", zap.InfoLevel, "override the default log level")
-	cfg := zap.NewProductionConfig()
-	cfg.Level.SetLevel(*logLevel)
-	logger, err := cfg.Build()
-	Expect(err).Should(BeNil())
-
-	sugar := logger.Sugar()
-	// nolint
-	defer logger.Sync() // flushes buffer, if any
-	Expect(sugar).ShouldNot(BeNil())
-
-	rt := roundtripper.NewTransport(ctx, sugar)
-
-	httpClient = &http.Client{
-		Transport: rt,
-	}
-
-	ghClient = github.NewClient(httpClient)
-	graphClient = githubv4.NewClient(httpClient)
 })
 
 var _ = AfterSuite(func() {

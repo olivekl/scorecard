@@ -22,8 +22,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/google/go-github/v38/github"
-	"github.com/shurcooL/githubv4"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 
@@ -31,7 +29,6 @@ import (
 	"github.com/ossf/scorecard/v2/clients/githubrepo"
 	"github.com/ossf/scorecard/v2/pkg"
 	"github.com/ossf/scorecard/v2/repos"
-	"github.com/ossf/scorecard/v2/roundtripper"
 )
 
 //nolint:gochecknoinits
@@ -69,16 +66,9 @@ var serveCmd = &cobra.Command{
 			if err := repo.Set(repoParam); err != nil {
 				rw.WriteHeader(http.StatusBadRequest)
 			}
-			sugar.Info(repoParam)
 			ctx := r.Context()
-			rt := roundtripper.NewTransport(ctx, sugar)
-			httpClient := &http.Client{
-				Transport: rt,
-			}
-			githubClient := github.NewClient(httpClient)
-			graphClient := githubv4.NewClient(httpClient)
-			repoClient := githubrepo.CreateGithubRepoClient(ctx, githubClient, graphClient)
-			repoResult, err := pkg.RunScorecards(ctx, repo, checks.AllChecks, repoClient, httpClient, githubClient, graphClient)
+			repoClient := githubrepo.CreateGithubRepoClient(ctx)
+			repoResult, err := pkg.RunScorecards(ctx, repo, checks.AllChecks, repoClient)
 			if err != nil {
 				sugar.Error(err)
 				rw.WriteHeader(http.StatusInternalServerError)

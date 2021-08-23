@@ -44,7 +44,6 @@ import (
 	sce "github.com/ossf/scorecard/v2/errors"
 	"github.com/ossf/scorecard/v2/pkg"
 	"github.com/ossf/scorecard/v2/repos"
-	"github.com/ossf/scorecard/v2/roundtripper"
 	"github.com/ossf/scorecard/v2/stats"
 )
 
@@ -140,20 +139,6 @@ func createNetClients(ctx context.Context) (
 	repoClient clients.RepoClient,
 	httpClient *http.Client,
 	githubClient *github.Client, graphClient *githubv4.Client, logger *zap.Logger) {
-	cfg := zap.NewProductionConfig()
-	cfg.Level.SetLevel(zap.InfoLevel)
-	logger, err := cfg.Build()
-	if err != nil {
-		panic(err)
-	}
-	sugar := logger.Sugar()
-	// Use our custom roundtripper
-	rt := roundtripper.NewTransport(ctx, sugar)
-	httpClient = &http.Client{
-		Transport: rt,
-	}
-	githubClient = github.NewClient(httpClient)
-	graphClient = githubv4.NewClient(httpClient)
 	repoClient = githubrepo.CreateGithubRepoClient(ctx, githubClient, graphClient)
 	return
 }

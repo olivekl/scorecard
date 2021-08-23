@@ -33,7 +33,7 @@ func init() {
 
 // Fuzzing runs Fuzzing check.
 func Fuzzing(c *checker.CheckRequest) checker.CheckResult {
-	ossFuzzRepo := githubrepo.CreateGithubRepoClient(c.Ctx, c.Client, c.GraphClient)
+	ossFuzzRepo := githubrepo.CreateGithubRepoClient(c.Ctx)
 	if err := ossFuzzRepo.InitRepo("google", "oss-fuzz"); err != nil {
 		e := sce.Create(sce.ErrScorecardInternal, fmt.Sprintf("InitRepo: %v", err))
 		return checker.CreateRuntimeErrorResult(CheckFuzzing, e)

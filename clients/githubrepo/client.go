@@ -18,11 +18,14 @@ package githubrepo
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/google/go-github/v38/github"
 	"github.com/shurcooL/githubv4"
+	"go.uber.org/zap"
 
 	"github.com/ossf/scorecard/v2/clients"
+	"github.com/ossf/scorecard/v2/clients/githubrepo/roundtripper"
 )
 
 // Client is GitHub-specific implementation of RepoClient.
@@ -127,8 +130,22 @@ func (client *Client) Close() error {
 }
 
 // CreateGithubRepoClient returns a Client which implements RepoClient interface.
-func CreateGithubRepoClient(ctx context.Context,
-	client *github.Client, graphClient *githubv4.Client) clients.RepoClient {
+func CreateGithubRepoClient(ctx context.Context) clients.RepoClient {
+	cfg := zap.NewProductionConfig()
+	cfg.Level.SetLevel(zap.InfoLevel)
+	logger, err := cfg.Build()
+	if err != nil {
+		panic(err)
+	}
+	sugar := logger.Sugar()
+	// Use our custom roundtripper
+	rt := roundtripper.NewTransport(ctx, sugar)
+	httpClient := &http.Client{
+		Transport: rt,
+	}
+	client := github.NewClient(httpClient)
+	graphClient := githubv4.NewClient(httpClient)
+
 	return &Client{
 		ctx:        ctx,
 		repoClient: client,
