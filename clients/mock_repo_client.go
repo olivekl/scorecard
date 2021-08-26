@@ -119,6 +119,21 @@ func (mr *MockRepoClientMockRecorder) IsArchived() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsArchived", reflect.TypeOf((*MockRepoClient)(nil).IsArchived))
 }
 
+// ListBranches mocks base method.
+func (m *MockRepoClient) ListBranches() ([]BranchRef, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListBranches")
+	ret0, _ := ret[0].([]BranchRef)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListBranches indicates an expected call of ListBranches.
+func (mr *MockRepoClientMockRecorder) ListBranches() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListBranches", reflect.TypeOf((*MockRepoClient)(nil).ListBranches))
+}
+
 // ListCommits mocks base method.
 func (m *MockRepoClient) ListCommits() ([]Commit, error) {
 	m.ctrl.T.Helper()

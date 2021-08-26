@@ -40,7 +40,17 @@ type graphqlData struct {
 		DefaultBranchRef struct {
 			Name                 githubv4.String
 			BranchProtectionRule struct {
+				DismissesStaleReview githubv4.Boolean
+				IsAdminEnforced      githubv4.Boolean
+				RequiresStatusChecks githubv4.Boolean
+			}
+			RefUpdateRule struct {
+				AllowsDeletion               githubv4.Boolean
+				AllowsForcePushes            githubv4.Boolean
 				RequiredApprovingReviewCount githubv4.Int
+				RequiredStatusCheckContexs   []githubv4.String
+				RequiredCodeOwnerReviews     githubv4.Boolean
+				RequiresLinearHistory        githubv4.Boolean
 			}
 			Target struct {
 				Commit struct {
@@ -195,8 +205,10 @@ func defaultBranchRefFrom(data *graphqlData) clients.BranchRef {
 	return clients.BranchRef{
 		Name: string(data.Repository.DefaultBranchRef.Name),
 		BranchProtectionRule: clients.BranchProtectionRule{
-			RequiredApprovingReviewCount: int(
-				data.Repository.DefaultBranchRef.BranchProtectionRule.RequiredApprovingReviewCount),
+			RequiresPullRequestReviews: clients.PullRequestReviewRule{
+				RequiredApprovingReviewCount: int(
+					data.Repository.DefaultBranchRef.RefUpdateRule.RequiredApprovingReviewCount),
+			},
 		},
 	}
 }

@@ -22,5 +22,18 @@ type BranchRef struct {
 
 // BranchProtectionRule specifies rules for a Git branch.
 type BranchProtectionRule struct {
+	AllowsForcePushes           bool
+	AllowsDeletions             bool
+	RequiresLinearHistory       bool
+	IsAdminEnforced             bool
+	RequiresStrictStatusChecks  bool
+	RequiredStatusCheckContexts []string
+	RequiresPullRequestReviews  PullRequestReviewRule
+}
+
+// PullRequestReviewRule specifies rules for PR review.
+type PullRequestReviewRule struct {
 	RequiredApprovingReviewCount int
+	DismissesStaleReviews        bool
+	RequiresCodeOwnerReviews     bool
 }

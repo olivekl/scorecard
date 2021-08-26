@@ -138,7 +138,7 @@ func isPrReviewRequired(c *checker.CheckRequest) (int, string) {
 	if err != nil {
 		sce.Create(sce.ErrScorecardInternal, fmt.Sprintf("RepoClient.GetDefaultBranch: %v", err))
 	}
-	if branch.BranchProtectionRule.RequiredApprovingReviewCount >= 1 {
+	if branch.BranchProtectionRule.RequiresPullRequestReviews.RequiredApprovingReviewCount >= 1 {
 		// If the default value is 0 when we cannot retrieve the value,
 		// a non-zero value means we're confident it's enabled.
 		return checker.MaxResultScore, "branch protection for default branch is enabled"

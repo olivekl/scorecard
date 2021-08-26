@@ -81,10 +81,9 @@ func TestReleaseAndDevBranchProtected(t *testing.T) {
 	tests := []struct {
 		name          string
 		expected      scut.TestReturn
-		branches      []*string
+		branches      []clients.BranchRef
 		defaultBranch string
 		releases      []*string
-		protections   map[string]*github.Protection
 		nonadmin      bool
 	}{
 		{
@@ -97,43 +96,55 @@ func TestReleaseAndDevBranchProtected(t *testing.T) {
 				NumberOfDebug: 0,
 			},
 			defaultBranch: main,
-			branches:      []*string{&rel1, &main},
-			releases:      nil,
-			protections: map[string]*github.Protection{
-				"main": {
-					RequiredStatusChecks: &github.RequiredStatusChecks{
-						Strict:   false,
-						Contexts: nil,
-					},
-					RequiredPullRequestReviews: &github.PullRequestReviewsEnforcement{
-						DismissalRestrictions: &github.DismissalRestrictions{
-							Users: nil,
-							Teams: nil,
+			branches: []clients.BranchRef{
+				clients.BranchRef{
+					Name: rel1,
+				},
+				clients.BranchRef{
+					Name: main,
+					BranchProtectionRule: clients.BranchProtectionRule{
+						RequiresStrictStatusChecks:  false,
+						RequiredStatusCheckContexts: nil,
+						RequiresPullRequestReviews: clients.PullRequestReviewRule{
+							DismissesStaleReviews:        false,
+							RequiresCodeOwnerReviews:     false,
+							RequiredApprovingReviewCount: 0,
 						},
-						DismissStaleReviews:          false,
-						RequireCodeOwnerReviews:      false,
-						RequiredApprovingReviewCount: 0,
-					},
-					EnforceAdmins: &github.AdminEnforcement{
-						URL:     nil,
-						Enabled: false,
-					},
-					Restrictions: &github.BranchRestrictions{
-						Users: nil,
-						Teams: nil,
-						Apps:  nil,
-					},
-					RequireLinearHistory: &github.RequireLinearHistory{
-						Enabled: false,
-					},
-					AllowForcePushes: &github.AllowForcePushes{
-						Enabled: false,
-					},
-					AllowDeletions: &github.AllowDeletions{
-						Enabled: false,
+						IsAdminEnforced:       false,
+						RequiresLinearHistory: false,
+						AllowsForcePushes:     false,
+						AllowsDeletions:       false,
 					},
 				},
 			},
+			releases: nil,
+			//protections: map[string]*github.Protection{
+			//	"main": {
+			//		RequiredPullRequestReviews: &github.PullRequestReviewsEnforcement{
+			//			DismissalRestrictions: &github.DismissalRestrictions{
+			//				Users: nil,
+			//				Teams: nil,
+			//			},
+			//		},
+			//		EnforceAdmins: &github.AdminEnforcement{
+			//			URL: nil,
+			//		},
+			//		Restrictions: &github.BranchRestrictions{
+			//			Users: nil,
+			//			Teams: nil,
+			//			Apps:  nil,
+			//		},
+			//		RequireLinearHistory: &github.RequireLinearHistory{
+			//			Enabled: false,
+			//		},
+			//		AllowForcePushes: &github.AllowForcePushes{
+			//			Enabled: false,
+			//		},
+			//		AllowDeletions: &github.AllowDeletions{
+			//			Enabled: false,
+			//		},
+			//	},
+			//},
 		},
 		{
 			name: "Take worst of release and development",
@@ -145,8 +156,16 @@ func TestReleaseAndDevBranchProtected(t *testing.T) {
 				NumberOfDebug: 0,
 			},
 			defaultBranch: main,
-			branches:      []*string{&rel1, &main},
-			releases:      []*string{&rel1},
+
+			branches: []clients.BranchRef{
+				clients.BranchRef{
+					Name: rel1,
+				},
+				clients.BranchRef{
+					Name: main,
+				},
+			},
+			releases: []*string{&rel1},
 			protections: map[string]*github.Protection{
 				"main": {
 					RequiredStatusChecks: &github.RequiredStatusChecks{
